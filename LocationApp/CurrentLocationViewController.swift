@@ -20,11 +20,13 @@ class CurrentLocationViewController: UIViewController, CLLocationManagerDelegate
 
     //MARK: - Variables
     let locationManager = CLLocationManager()
+    var location: CLLocation?
 
     //MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         locationManager.delegate = self
+        updateLabels()
     }
 
     //MARK: - Methods
@@ -37,6 +39,22 @@ class CurrentLocationViewController: UIViewController, CLLocationManagerDelegate
                                      handler: nil)
         present(alert, animated: true, completion: nil)
         alert.addAction(okAction)
+    }
+
+    func updateLabels() {
+        if let location = location {
+            latitudeLabel.text = "Latitude is \(String(format: "%.8f", location.coordinate.latitude))"
+            longitudeLabel.text = "Longitude is \(String(format: "%.8f", location.coordinate.longitude))"
+
+            tagButton.isHidden = false
+            messageLabel.text = ""
+        } else {
+            latitudeLabel.text = ""
+            longitudeLabel.text = ""
+            addressLabel.text = ""
+            tagButton.isHidden = true
+            messageLabel.text = "Tap \"Get My Location\" to Start"
+        }
     }
 
     // MARK:- Actions
@@ -64,6 +82,9 @@ class CurrentLocationViewController: UIViewController, CLLocationManagerDelegate
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         let newLocation = locations.last!
         print("didUpdateLocations \(newLocation)")
+
+        location = newLocation
+        updateLabels()
     }
 }
 
